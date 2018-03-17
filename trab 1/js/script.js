@@ -1,3 +1,26 @@
+$(document).ready(function(){
+	atualizaTabela();
+});
+
+function atualizaTabela(){
+	var conteudo = "";
+	var linha;
+	var dimensao =$("#dimensao").val();
+	for(var i=1;i<=dimensao;i++){
+		linha="<td>";
+		for(j=1;j<=dimensao;j++){
+			// if(i==j)
+			// 	linha+= "<span class='barra'>-</span>"
+			// else
+				linha+="<input type='input' id='"+i+j+"'>"
+		}
+		linha+="</td>"	
+		conteudo+="<tr>"+linha+"</tr>"
+	}
+
+	$("#divTabela").append("<table>"+conteudo+"</table>");
+}
+
 function passeia(dimensao,matriz,no,R){
 	var I,J;
 	no.matriz = matriz;
