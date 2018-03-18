@@ -1,6 +1,35 @@
 $(document).ready(function(){
 	atualizaTabela();
+
+	const botaoCalcula = document.querySelectorAll("button.btn")[0];
+	const botaoLimpa = document.querySelectorAll("button.btn")[1];
+	var tabela; //É onde serão armazenados os valores
+	botaoCalcula.onclick = function(){tabela = pegarValoresDaTabela(botaoCalcula);} //ao clicar no botão calcula tabela receberá os valores que estão na tabela do site
 });
+
+function criarMatriz() { //Função que deixa as variaveis receberem valores como matrizes
+  var vetor = [];
+  for (let i=0;i<$("#dimensao").val();++i) {
+     vetor[i] = [];
+  }
+  return vetor;
+}
+
+function pegarValoresDaTabela(botaoCalcula){
+		let i, j, percorreVetor, dimensao;
+		var tabela = criarMatriz();
+		tabela[1][2] = 33;
+		for(i = percorreVetor = 0, dimensao = $("#dimensao").val(); i < dimensao; ++i){
+			for(j = 0; j < dimensao; ++j, ++percorreVetor){
+				if(i != j)
+					tabela[i][j] = document.querySelectorAll("input.casaTabela")[percorreVetor].value;
+				else
+					tabela[i][j] = null;
+			}
+		}
+		document.querySelector("p.teste").innerHTML = tabela[0][1];
+		return tabela;
+}
 
 function atualizaTabela(){
 	var conteudo = "";
@@ -12,9 +41,10 @@ function atualizaTabela(){
 			// if(i==j)
 			// 	linha+= "<span class='barra'>-</span>"
 			// else
-				linha+="<input type='input' id='"+i+j+"'>"
+				//linha+="<input type='input' id='"+i+j+"'>"
+				linha += "<input type='input' class='casaTabela'>"
 		}
-		linha+="</td>"	
+		linha+="</td>"
 		conteudo+="<tr>"+linha+"</tr>"
 	}
 
@@ -37,7 +67,7 @@ function passeia(dimensao,matriz,no,R){
 		var q = {};
 		no.sim = p;
 		no.nao = q;
-		
+
 		passeia(dimensao,penaliza(dimensao,matriz,I,J,0),p,R);
 		passeia(dimensao,penaliza(dimensao,matriz,I,J,1),q,R);
 	}
@@ -48,11 +78,11 @@ function passeia(dimensao,matriz,no,R){
 function resolve(no){
 	subtraiLinha(no);
 	subtraiColuna(no);
-		
+
 }
 
 function deuRuim(no,I,J){
-	
+
 }
 
 function penaliza(dimensao,matriz,I,J,n){
