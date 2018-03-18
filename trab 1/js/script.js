@@ -1,23 +1,32 @@
 $(document).ready(function(){
 	atualizaTabela();
+	$("#dimensao").change(atualizaTabela);
 });
 
 function atualizaTabela(){
-	var conteudo = "";
+	var conteudo="<th></th>";
 	var linha;
-	var dimensao =$("#dimensao").val();
-	for(var i=1;i<=dimensao;i++){
-		linha="<td>";
-		for(j=1;j<=dimensao;j++){
-			// if(i==j)
-			// 	linha+= "<span class='barra'>-</span>"
-			// else
-				linha+="<input type='input' id='"+i+j+"'>"
-		}
-		linha+="</td>"	
-		conteudo+="<tr>"+linha+"</tr>"
-	}
+	var dimensao = $("#dimensao").val();
 
+	$("#divTabela").empty();
+	for(j=1;j<=dimensao;j++)
+		conteudo+="<th class='tabeleiro'>"+j+"</th>";
+
+	for(var i=1;i<=dimensao;i++){
+		linha="<td class='tabeleiro'>"+i+"</td>";
+
+		for(j=1;j<=dimensao;j++){
+			linha+="<td>";
+			if(i==j)
+				// linha+= "<span class='barra'></span>"
+				linha += "<input type='input' disabled class='A B'  id='"+i+j+"'>"
+			else
+				linha+="<input type='input' class='A' id='"+i+j+"'>"
+			linha+="</td>"	
+		}
+			conteudo+="<tr>"+linha+"</tr>";
+	}
+		console.log(conteudo);
 	$("#divTabela").append("<table>"+conteudo+"</table>");
 }
 

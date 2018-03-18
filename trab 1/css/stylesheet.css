@@ -24,8 +24,18 @@ h2{
 	margin-top: 1.4%;
 }
 
-.barra{
-	width: 10%;
+
+.A{
+	width: 2em;
+}
+
+.tabeleiro{
+	font-weight: bold;
+	width: 1em;
+}
+
+th{
+	text-align: center;
 }
 
 input[type="button"]{
@@ -40,9 +50,21 @@ input[type="number"]{
 }
 
 input[type="input"]{
-	max-width: 10%;
+	max-width: 100%;
 }
 
 input[type="checkbox"]{
 	border-radius: 10px; 
+}
+
+.B{
+opacity: 50%;
+/*background-color: Lavender;*/
+/*background-color: dimgrey;*/
+	background-color: lightgrey;
+}
+
+#divTabela{
+	margin-top: 3em;
+	margin-left: 0.15em;
 }
