@@ -158,7 +158,4 @@ function main(){
 	pegarValoresDaTabela(tabela);
 	subtraiLinha(tabela);
 	subtraiColuna(tabela);
-	do{
-
-	}
 }
