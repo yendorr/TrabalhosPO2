@@ -149,6 +149,76 @@ function penaliza(dimensao,matriz,I,J,n){
 	return mat;
 }
 
+function restoDoHungaro(tabela,dimensao){
+	var zeros = [];	 	//salva quantos zeros existem em cada linha por indice
+	var marcados = [];	//coordenada dos valores marcados a serem possivelmente alocados
+	var riscados = [];	//coodenada de zeros que nao podem ser alocados
+	var contadorMarcados = 0; 	//quatidade de 0 marcados
+	var contadorRiscados = 0; 	//quatidade de 0 riscados
+	let i,j,k;					//contadores
+						//imagina ele na horizontal
+	marcados[1] = [];	//marca i do elemento
+	marcados[2] = [];	//marca j do elemento
+	riscados[1] = [];	//marca i do elemento riscado
+	riscados[2] = [];	//marca j do elemento riscado
+
+	//conta zeros
+	for(i=1;i<=dimensao;i++){	
+		zeros[i] = 0;
+		for(j=1;j<=dimensao;j++)
+			if(!tabela[i][j]) zeros[i]++;
+	}	
+}
+
+//marca e risca zeros
+function marcaERisca(tabela,riscado,marcado,dimensao,contadorRiscados,contadorMarcados){
+	let i,j,k;
+	contadorMarcados = 0;
+	contadorRiscados = 0;
+	i=linhaComMenosZeros(zeros, dimensao);
+
+	for(j=1; j<=dimensao; j++){
+		if(tabela[i][j] == 0 && !taResicado(i,j,riscados,contadorRiscados)){
+			marcados[1][++contadorMarcados] = i;
+			marcados[2][contadorMarcados] = j;
+			//risca linhas
+			for(k=1; k<=dimensao; k++){		//risca na linha
+				if(!tabela[i][k] && k!=j){	
+					riscados[1][++contadorRiscados] = i;
+					riscados[2][contadorRiscados] = k;
+				}
+				if(!tabela[k][j] && k!=i){	//risca na coluna
+					riscados[1][++contadorRiscados] = k;
+					riscados[2][contadorRiscados] = j;
+				}
+			}
+			break;
+		}
+	} 
+}
+
+//verifica se o elemento i j esta presente na matriz riscados
+function taRiscado(i,j,riscados,contadorRiscados){
+	let k;
+	let riscado = false;
+	for(k=1;k<=contadorRiscados && (!riscado);k++)
+		if(riscados[1][k] == i && riscados[2][k] == j ) riscado = true;
+	return riscado;
+}
+
+
+function linhaComMenosZeros(zeros,dimensao){
+	let indice = 0, menor = M;
+	let i;
+	for(i=1;j<=dimensao;j++)
+		if(zeros[i]<menor){
+			menor = zeros[i];
+			indice = i;
+		} 
+	
+	return indice;
+}
+
 function main(){
 	var i,j;
 	var tabela = [];
@@ -158,4 +228,6 @@ function main(){
 	pegarValoresDaTabela(tabela);
 	subtraiLinha(tabela);
 	subtraiColuna(tabela);
+	restoDoHungaro(tabela,dimensao);
+
 }
