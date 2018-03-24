@@ -53,7 +53,7 @@ input[type="input"]{
 	max-width: 100%;
 }
 
-input[type="checkbox"]{
+input[type="checkbox"]:attr("marked"){
 	border-radius: 10px; 
 }
 
@@ -61,6 +61,8 @@ input[type="checkbox"]{
 opacity: 50%;
 /*background-color: Lavender;*/
 /*background-color: dimgrey;*/
+	outline: none;
+	border: 1px solid #;
 	background-color: lightgrey;
 }
 
