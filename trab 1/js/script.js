@@ -153,8 +153,9 @@ function restoDoHungaro(tabela,dimensao){
 	var zeros = [];	 	//salva quantos zeros existem em cada linha por indice(primeira posiçao do vetor salva quantos zeros existem na linha 1)
 	var marcados = [];	//coordenada dos valores marcados a serem possivelmente alocados
 	var riscados = [];	//coodenada de zeros que nao podem ser alocados
-	var linhasMarcadas = []; 	//salva linhas marcadas
-	var colunasMarcadas = [];	//salva colunas marcadas
+	var marcadas = {};
+	marcadas.linhas = []; 	//salva linhas marcadas
+	marcadas.colunas = [];	//salva colunas marcadas
 	var contador = {};
 	contador.marcados = 0;		//quantidade de 0 marcados
 	contador.riscados = 0;		//quantidade de 0 riscados
@@ -175,19 +176,59 @@ function restoDoHungaro(tabela,dimensao){
 
 
 	
-	while(temZeros(zeros,dimensao))	
-	marcaERisca(tabela,zeros,riscados,marcados,dimensao,contador); //tenta fazer uma alocação
+	while(temZeros(zeros,dimensao))marcaERisca(tabela,zeros,riscados,marcados,dimensao,contador); //tenta fazer uma alocação
 	
-	while(contador.marcados<dimensao){
+	// while(contador.marcados<dimensao){
 
-		marcaLinha();
+		marcaLinhasSemZero(marcadas,marcados,riscados,contador,dimensao);
 
-
-		if(contador.marcados<dimensao)
-			while(temZeros(zeros,dimensao))marcaERisca(tabela,zeros,riscados,marcados,dimensao,contador);
-	}	
+		// if(contador.marcados<dimensao)
+			// while(temZeros(zeros,dimensao))marcaERisca(tabela,zeros,riscados,marcados,dimensao,contador);
+	// }
 }
 
+function marcaLinhasSemZero(marcadas,marcados,riscados,contador,dimensao){
+	let i;
+	
+	for(i=1;i<=dimensao;i++){
+		marcadas.linhas[i] = false;
+		marcadas.colunas[i] = false;
+	}
+
+
+	for(i=1;i<=dimensao;i++){
+		marcadas.linhas[i] = !(linhaTemZeroMarcado(i,marcados,contador));
+		if(marcadas.linhas[i])
+			marcaColuna(i,marcadas,riscados,marcados,contador,dimensao);
+	}
+}
+
+function marcaColuna(linha,marcadas,riscados,marcados,contador,dimensao){
+	let j;
+	for(j=1;j<=dimensao;j++){
+		if(elementoTaRiscado(linha,j,riscados,contador)){
+			marcadas.colunas[j] = true;
+			marcaLinha(j,marcadas,riscados,marcados,contador,dimensao);
+		}
+	}
+}
+
+function marcaLinha(coluna,marcadas,riscados,marcados,contador,dimensao){
+	let i;
+	for(i=1;i<=dimensao;i++){
+		if(elementoTaMarcado(i,coluna,marcados,contador)){
+			marcadas.linhas[i] = true;
+			marcaColuna(i,marcadas,riscados,marcados,contador,dimensao);
+		}
+	}
+}
+
+// function temPraMarcar(marcadas,dimensao){
+// 	let i;
+// 	for(i=1;i<=dimensao;i++)
+// 		if( !marcadas.colunas[i] || !marcadas.linhas[i]) return true;
+// 	return false;
+// }
 
 //verifica se existe zeros nao marcados nem riscados para a alocação
 function temZeros(zeros,dimensao){
@@ -204,51 +245,54 @@ function marcaERisca(tabela,zeros,riscados,marcados,dimensao,contador){
 	i=linhaComMenosZeros(zeros, dimensao);
 
 	for(j=1; j<=dimensao; j++){
-		console.log(i);
-		console.log(j);
 		if(tabela[i][j] == 0)
-				if(!elementoTaRiscado(i,j,riscados,contador)){
-
-			marcados[1][++contador.marcados] = i;
-			marcados[2][contador.marcados] = j;
-			zeros[i]--;
-			//risca zeros pra n ter alocação errada
-			for(k=1; k<=dimensao; k++){		//risca na linha
-				if(!tabela[i][k] && k!=j && !elementoTaRiscado(i,k,riscados,contador)){
-					riscados[1][++contador.riscados] = i;
-					riscados[2][contador.riscados] = k;
-					zeros[i]--;
+			if(!elementoTaRiscado(i,j,riscados,contador)){
+				marcados[1][++contador.marcados] = i;
+				marcados[2][contador.marcados] = j;
+				zeros[i]--;
+				//risca zeros pra n ter alocação errada
+				for(k=1; k<=dimensao; k++){		//risca na linha
+					if(!tabela[i][k] && k!=j && !elementoTaRiscado(i,k,riscados,contador)){
+						riscados[1][++contador.riscados] = i;
+						riscados[2][contador.riscados] = k;
+						zeros[i]--;
+					}
+					if(!tabela[k][j] && k!=i && !elementoTaRiscado(k,j,riscados,contador)){	//risca na coluna
+						riscados[1][++contador.riscados] = k;
+						riscados[2][contador.riscados] = j;
+						zeros[k]--;
+					}
 				}
-				if(!tabela[k][j] && k!=i && !elementoTaRiscado(k,j,riscados,contador)){	//risca na coluna
-					riscados[1][++contador.riscados] = k;
-					riscados[2][contador.riscados] = j;
-					zeros[k]--;
-				}
+				break;
 			}
-			break;
-		}
 	}
 }
 
 //verifica se o elemento i j esta presente na matriz riscados
 function elementoTaRiscado(i,j,riscados,contador){
 	let k;
-	let riscado = false;
-	for(k=1;k<=contador.riscados && (!riscado);k++)
-		if(riscados[1][k] == i && riscados[2][k] == j ) riscado = true;
-	return riscado;
+	for(k=1;k<=contador.riscados ;k++)
+		if(riscados[1][k] == i && riscados[2][k] == j ) return true;
+	return false;
+}
+
+function elementoTaMarcado(i,j,marcados,contador){
+	let k;
+	for(k=1;k<=contador.marcados;k++)
+		if(marcados[1][k] == i && marcados[2][k] == j) return true;
+	return false;
 }
 
 //verifica se a linha tem um zero marcado
-function linhaTemMarcado(i,marcados,contador){
-	let j;
+function linhaTemZeroMarcado(i,marcados,contador){
+	let k;
 	let marcado = false;
-	for(j=1;j<=contador.marcados && !marcado;j++)
-		if(marcados[1][j] == i)
+	for(k=1;k<=contador.marcados && !marcado;k++)
+		if(marcados[1][k] == i)
 			marcado = true;
+	return marcado;
 }
 
-// marcaLinha()
 
 
 function linhaComMenosZeros(zeros,dimensao){

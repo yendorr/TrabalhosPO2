@@ -1,0 +1,31 @@
+MÉTODOS HÚNGARO
+
+Passo 1
+Subtrair o menor elemento de cada coluna de todos os elementos da coluna.
+
+Passo 2
+Subtrair o menor elemento de cada linha de todos os elementos da linha.
+
+Passo 3
+Escolher linhas, começando com a de menor número de zeros e prosseguindo por ordem crescente de zeros. Marcar um zero na linha e eliminar os zeros existentes na mesma linha e coluna. Proceder do mesmo modo até não haver mais zeros para marcar ou cortar. Se obtiver só um zero marcado em cada linha e em cada coluna, então esse conjunto de zeros define uma solução ótima. Caso contrário, continua-se o método.
+
+Passo 4
+Marcar todas as linhas que não tenham um zero marcado.
+
+Passo 5
+Marcar, nas linhas antes marcadas, todas as colunas que tenham pelo menos um zero cortado.
+
+Passo 6
+Marcar, nas colunas antes marcadas, todas as linhas que tenham zeros marcados.
+
+Passo 7
+Repetir os passos 5 e 6 até não haver mais linhas ou colunas para marcar.
+
+Passo 8
+Assinalar todas as linhas não marcadas e todas as colunas marcadas.
+
+Passo 9
+Considerar o menor elemento da submatriz dos elementos não assinalados por aquelas linhas e colunas. Subtrair esse valor a todos os elementos da submatriz e, somá-lo aos elementos da intersecção entre as linhas e colunas assinaladas.
+
+Passo 10
+Recomeçar no Passo 3.
