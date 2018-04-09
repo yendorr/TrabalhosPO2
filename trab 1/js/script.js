@@ -78,12 +78,13 @@ function passeia(dimensao,matriz,no,R){
 	no.valido = false;
 	no.z = M;
 	no.caminho = [];
+	no.caminho[1] = [];
+	no.caminho[2] = [];
 	no.p1 = null;
 	no.p2 = null;
 
 	resolve(no);
-
-	if(deuRuim(no,I,J)){
+	if(deuRuim(no,dimensao)){
 		var p = {};
 		var q = {};
 		no.p1 = p;
@@ -92,42 +93,54 @@ function passeia(dimensao,matriz,no,R){
 		if(R.z>no.z)
 			R = no;
 
-		passeia(dimensao,penaliza(dimensao,matriz,I,J,0),p,R);
-		passeia(dimensao,penaliza(dimensao,matriz,I,J,1),q,R);
+		 passeia(dimensao,penaliza(dimensao,matriz,I,J,0),p,R);
+		 passeia(dimensao,penaliza(dimensao,matriz,I,J,1),q,R);
 	}
 }
 
 function resolve(no){
-	subtraiLinha(no.matriz);
-	subtraiColuna(no.matriz);	
+	let dimensao = $("#dimensao").val();
+	subtraiLinha(no);
+	subtraiColuna(no);
+	restoDoHungaro(no,dimensao,no.caminho);
 }
 
-function subtraiLinha(matriz){
+function subtraiLinha(no){
 	let menor,i,j;
 	let dimensao = $("#dimensao").val();
 	for(i = 1;i<=dimensao;i++){
 		menor = M;
 		for(j=1;j<=dimensao;j++)
-			if(matriz[i][j] < menor ) menor = matriz[i][j]
-		if(menor)		
-			for(j=1;j<=dimensao;j++) matriz[i][j] -= menor;
+			if(no.matriz[i][j] < menor ) menor = no.matriz[i][j]
+		if(menor)	
+			for(j=1;j<=dimensao;j++) no.matriz[i][j] -= menor;
 	}
 }
 
-function subtraiColuna(matriz){
+function subtraiColuna(no){
 	let menor,i,j;
 	let dimensao = $("#dimensao").val();
 	for(j = 1;j<=dimensao;j++){
 		menor = M;
 		for(i=1;i<=dimensao;i++)
-			if(matriz[i][j] < menor) menor = matriz[i][j];
+			if(no.matriz[i][j] < menor) menor = no.matriz[i][j];
 		if(menor)
-			for(i = 1; i<=dimensao;i++) matriz[i][j] -= menor;
+			for(i = 1; i<=dimensao;i++) no.matriz[i][j] -= menor;
 	}
 }
 
-function deuRuim(no,I,J){
+function deuRuim(no,dimensao){
+	let contadorVisitadas = 0;
+	let visitadas = [];
+	let k = 1;
 	
+	do{
+	Colocar()
+	vericar()
+	}while()
+
+
+
 }
 
 function penaliza(dimensao,matriz,I,J,n){
@@ -149,7 +162,7 @@ function penaliza(dimensao,matriz,I,J,n){
 	return mat;
 }
 
-function restoDoHungaro(tabela,dimensao){
+function restoDoHungaro(no,dimensao){
 	var zeros = [];	 	//salva quantos zeros existem em cada linha por indice(primeira posiçao do vetor salva quantos zeros existem na linha 1)
 	var marcados = [];	//coordenada dos valores marcados a serem possivelmente alocados
 	var riscados = [];	//coodenada de zeros que nao podem ser alocados
@@ -167,24 +180,67 @@ function restoDoHungaro(tabela,dimensao){
 	riscados[1] = [];	//marca i do elemento riscado
 	riscados[2] = [];	//marca j do elemento riscado
 
-	//conta zeros
-	for(i=1;i<=dimensao;i++){	
+	contaZeros(no.matriz,zeros,dimensao);
+
+	while(temZeros(zeros,dimensao))marcaERisca(no.matriz,zeros,riscados,marcados,dimensao,contador); //tenta fazer uma alocação
+	
+
+	while(contador.marcados < dimensao){
+
+		marcaLinhasSemZero(marcadas,marcados,riscados,contador,dimensao);
+
+		zeraMarcadosERiscados(marcados,riscados,contador);
+
+		trocaLinha(marcadas,dimensao);
+
+		subSomaMenor(marcadas,no,dimensao)//*//
+
+		contaZeros(no.matriz,zeros,dimensao)
+		
+		while(temZeros(zeros,dimensao))marcaERisca(no.matriz,zeros,riscados,marcados,dimensao,contador); //tenta fazer uma alocação	
+	}
+	no.caminho=marcados;
+}
+
+function subSomaMenor(marcadas,no,dimensao){
+	let i,j;
+	let menor = M;
+	for(i=1;i<=dimensao;i++)
+		for(j=1;j<=dimensao;j++)
+			if(!assinalado(marcadas,i,j,dimensao) && no.matriz[i][j]<menor)
+				menor = no.matriz[i][j];
+	for(i=1;i<=dimensao;i++)
+		for(j=1;j<=dimensao;j++)
+			if(!assinalado(marcadas,i,j,dimensao))
+				no.matriz[i][j] -= menor;
+			else if(assinaladasso(marcadas,i,j,dimensao))
+				no.matriz[i][j] += menor;
+}
+
+function assinaladasso(marcadas,i,j,dimensao){
+		if(marcadas.linhas[i] && marcadas.colunas[j])
+			return true;
+	return false;
+}
+
+function assinalado(marcadas,i,j,dimensao){
+		if(marcadas.linhas[i] || marcadas.colunas[j])
+			return true;
+	return false;
+}
+
+function contaZeros(tabela,zeros,dimensao){
+	let i,j;
+	for(i=1;i<=dimensao;i++){
 		zeros[i] = 0;
 		for(j=1;j<=dimensao;j++)
 			if(!tabela[i][j]) zeros[i]++;
 	}
+}
 
-
-	
-	while(temZeros(zeros,dimensao))marcaERisca(tabela,zeros,riscados,marcados,dimensao,contador); //tenta fazer uma alocação
-	
-	// while(contador.marcados<dimensao){
-
-		marcaLinhasSemZero(marcadas,marcados,riscados,contador,dimensao);
-
-		// if(contador.marcados<dimensao)
-			// while(temZeros(zeros,dimensao))marcaERisca(tabela,zeros,riscados,marcados,dimensao,contador);
-	// }
+function trocaLinha(marcadas,dimensao){
+	let i;
+	for(i=1;i<=dimensao;i++) marcadas.linhas[i] = !marcadas.linhas[i];
 }
 
 function marcaLinhasSemZero(marcadas,marcados,riscados,contador,dimensao){
@@ -194,7 +250,6 @@ function marcaLinhasSemZero(marcadas,marcados,riscados,contador,dimensao){
 		marcadas.linhas[i] = false;
 		marcadas.colunas[i] = false;
 	}
-
 
 	for(i=1;i<=dimensao;i++){
 		marcadas.linhas[i] = !(linhaTemZeroMarcado(i,marcados,contador));
@@ -220,6 +275,19 @@ function marcaLinha(coluna,marcadas,riscados,marcados,contador,dimensao){
 			marcadas.linhas[i] = true;
 			marcaColuna(i,marcadas,riscados,marcados,contador,dimensao);
 		}
+	}
+}
+
+function zeraMarcadosERiscados(marcados,riscados,contador)
+{	while(contador.riscados){
+		riscados[1][contador.riscados] = 0;
+		riscados[2][contador.riscados] = 0;
+		contador.riscados--;
+	}
+	while(contador.marcados){
+		marcados[1][contador.marcados] = 0;
+		marcados[2][contador.marcados] = 0;
+		contador.marcados--;
 	}
 }
 
@@ -308,13 +376,21 @@ function linhaComMenosZeros(zeros,dimensao){
 }
 
 function main(){
-	var i,j;
+	let i;
 	var tabela = [];
-	
 	var dimensao = $("#dimensao").val();
 	for(i=1;i<=dimensao;i++) tabela[i] = [];
 	pegarValoresDaTabela(tabela);
-	subtraiLinha(tabela);
-	subtraiColuna(tabela);
-	restoDoHungaro(tabela,dimensao);
+	var no = {};
+	var r = {};
+	r.matriz = tabela;
+	r.valido = false;
+	r.z = M;
+	r.caminho = [];
+	r.caminho[1] = [];
+	r.caminho[2] = [];
+	r.p1 = null;
+	r.p2 = null;
+	
+	passeia(dimensao,tabela,no,r);
 }
