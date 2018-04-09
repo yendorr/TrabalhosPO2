@@ -1,2 +1,1 @@
-Bom dia meus batutas.
-Até agora o programa só mostra o resultado no console do browser.
+Clique em index.html pra rodar o programa.

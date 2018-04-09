@@ -193,7 +193,7 @@ function main(){
 
 	//Daqui até o final estou printando os resultados
 	for(i = fonte, resulto = "", j = true; j == true && i != destino;){
-		resulto = resulto + i + "(" + tabela[i][tabelaIndex[caminho[i]][i]] + ")--> " + tabelaIndex[caminho[i]][i];
+		resulto = resulto + i + "(" + tabela[i][tabelaIndex[caminho[i]][i]] + ")--> ";
 		if(caminho[i] == 0){
 			resulto = "Não há como chegar no destino";
 			j = false;
@@ -201,7 +201,7 @@ function main(){
 		i = tabelaIndex[caminho[i]][i];
 	}
 	if(i == destino)
-		resulto = resulto + destino + "\nCusto total: " + caminhoCusto[fonte];
+		resulto = resulto + destino + " Custo total: " + caminhoCusto[fonte];
 	$("#resultado").text(resulto);
 	console.log(tabela);
 }
