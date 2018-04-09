@@ -76,7 +76,7 @@ function pegarValoresDaTabela(tabela, dimensao, fonte, destino){
 			for(j = 1; j <= dimensao; j++){
 				if(i != j && j != fonte && i != destino){
 					tabela[i][j] = Number($("#A"+i+""+j).val());
-					if($("#A"+i+""+j).val() == ""){
+					if($("#A"+i+""+j).val() == "" || $.isNumeric($("#A"+i+""+j).val()) == false){
 						tabela[i][j] = undefined;
 					}
 				}
@@ -203,4 +203,5 @@ function main(){
 	if(i == destino)
 		resulto = resulto + destino + "\nCusto total: " + caminhoCusto[fonte];
 	$("#resultado").text(resulto);
+	console.log(tabela);
 }
