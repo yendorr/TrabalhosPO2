@@ -1,9 +1,11 @@
 const dimensaoMaxima = 17, dimensaoMinima = 2;//limita o numero de nós
 const M = (27+10+1998)*999999999999; // infinito
+var result = false;
+var stringResult;
 
 $(document).ready(function(){
 	atualizaTabela();
-	$("#dimensao").change(atualizaTabela);//listennner pra atualizar a tabela
+	$("#dimensao").change(atualizaTabela);//listenner pra atualizar a tabela
 	$("#fonte").change(validaFonte);
 	$("#destino").change(validaDestino);
 	$("#calcula").click(main);
@@ -164,6 +166,7 @@ function main(){
 	var visitados = []; //Booleano que armazena se o arco foi visitado ou não
 	var caminho = []; //Onde armazena a resposta, indica o nó com melhor caminho para a resposta final em cada nó.
 	var caminhoCusto = []; //O mesmo que o anterior mas armazena o custo total melhor do rfespectivo nó até o nó destino
+	var resulto;
 
 	var dimensao = Number($("#dimensao").val());
 	var fonte = Number($("#fonte").val());
@@ -171,6 +174,7 @@ function main(){
 
 	if(fonte == destino){
 		alert("O nó fonte não deve ser o mesmo que o nó destino\nPor favor selecione nós diferentes");
+		$("#resultado").text("");
 		return false;
 	}
 
@@ -188,15 +192,15 @@ function main(){
 	recursao(tabela, dimensao, fonte, destino, tabelaIndex, visitados, fonte, caminho, caminhoCusto); //Aqui que a magia acontece
 
 	//Daqui até o final estou printando os resultados
-	console.log("Resultados:");
-	for(i = fonte, j = true; j == true && i != destino;){
-		console.log(i + "(" + tabela[i][tabelaIndex[caminho[i]][i]] + ")--> " + tabelaIndex[caminho[i]][i]);
+	for(i = fonte, resulto = "", j = true; j == true && i != destino;){
+		resulto = resulto + i + "(" + tabela[i][tabelaIndex[caminho[i]][i]] + ")--> " + tabelaIndex[caminho[i]][i];
 		if(caminho[i] == 0){
-			console.log("Nao ha como chegar no destino");
+			resulto = "Não há como chegar no destino";
 			j = false;
 		}
 		i = tabelaIndex[caminho[i]][i];
 	}
 	if(i == destino)
-		console.log(destino + "\nCusto total: " + caminhoCusto[fonte]);
+		resulto = resulto + destino + "\nCusto total: " + caminhoCusto[fonte];
+	$("#resultado").text(resulto);
 }
