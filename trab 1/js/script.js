@@ -72,9 +72,20 @@ function atualizaTabela(){
 	$("#divTabela").append("<table>"+conteudo+"</table>");
 }
 
-function passeia(dimensao,matriz,no,R){
-	let I,J;
-	no.matriz = matriz;
+function passeia(dimensao,matriz,matrizOriginal,no,R,loop){
+	let arcoDefeituoso = {};
+	arcoDefeituoso.i = 0;
+	arcoDefeituoso.j = 0;
+	loop.vezes[0] = 1;
+
+	let i,j;
+	no.matriz = [];
+	for(i=1;i<=dimensao;i++){
+		no.matriz[i] = [];
+		for(j=1;j<=dimensao;j++)
+			no.matriz[i][j]  = matriz[i][j];
+	}
+
 	no.valido = false;
 	no.z = M;
 	no.caminho = [];
@@ -82,27 +93,78 @@ function passeia(dimensao,matriz,no,R){
 	no.caminho[2] = [];
 	no.p1 = null;
 	no.p2 = null;
+	resolve(no,matrizOriginal);
+	if(deuRuim(no,dimensao,arcoDefeituoso,loop.vezes[0])){
 
-	resolve(no);
-	if(deuRuim(no,dimensao)){
 		var p = {};
 		var q = {};
 		no.p1 = p;
 		no.p2 = q;
-		
-		if(R.z>no.z)
-			R = no;
 
-		 passeia(dimensao,penaliza(dimensao,matriz,I,J,0),p,R);
-		 passeia(dimensao,penaliza(dimensao,matriz,I,J,1),q,R);
+		// if(loopou(loop,no,dimensao)) return 0;
+
+		 passeia(dimensao,penaliza(dimensao,no.matriz,matrizOriginal,arcoDefeituoso.i,arcoDefeituoso.j,0),matrizOriginal,p,R,loop);
+		 passeia(dimensao,penaliza(dimensao,no.matriz,matrizOriginal,arcoDefeituoso.i,arcoDefeituoso.j,1),matrizOriginal,q,R,loop);
+	}
+	else if(R.z>no.z){
+			R = no;
+			R.valido = true;
 	}
 }
 
-function resolve(no){
+function loopou(loop,no,dimensao){
+	let k;
+	for(k=1;k<=loop.contadorDeCaminhos;k++)
+		if(caminhosIguais(loop,no,k,dimensao)){
+			loop.vezes[k]++;
+			break;
+		}
+	
+	salvaCaminho(loop,no,dimensao);
+	if(loop.vezes[k] >= 5){
+		loop.vezes[0]%=(dimensao-1);
+		loop.vezes[0]++;
+
+	for(k=1;k<=100;k++)	loop.vezes[k] = 0;
+	return true;
+	}
+	return false;
+}
+
+function salvaCaminho(loop,no,dimensao){
+	let i,j,k;
+	loop.contadorDeCaminhos ++;
+	for(k=1;k<=dimensao;k++){
+		loop.caminhosPercorridos[loop.contadorDeCaminhos][1][k] = no.caminho[1][k];
+		loop.caminhosPercorridos[loop.contadorDeCaminhos][2][k] = no.caminho[2][k];
+	}
+}
+function caminhosIguais(loop,no,k,dimensao){
+	let i;
+	let eqq=0;
+	for(i=1;i<=dimensao;i++)
+		if(loop.caminhosPercorridos[k][1][i] == no.caminho[1][i] && loop.caminhosPercorridos[k][2][i] == no.caminho[2][i]){
+			eqq ++;
+		}
+	if(eqq == dimensao)
+	return true;
+	return false;				
+	
+}
+
+function resolve(no,matriz){
 	let dimensao = $("#dimensao").val();
 	subtraiLinha(no);
 	subtraiColuna(no);
-	restoDoHungaro(no,dimensao,no.caminho);
+	restoDoHungaro(no,dimensao,matriz);
+}
+
+function calculaZ(no,matriz,dimensao){
+	let soma = 0;
+	let k;
+	for(k=1;k<=dimensao;k++)
+		soma+=Number(matriz[no.caminho[1][k]][no.caminho[2][k]]);
+	return soma;
 }
 
 function subtraiLinha(no){
@@ -129,40 +191,61 @@ function subtraiColuna(no){
 	}
 }
 
-function deuRuim(no,dimensao){
-	let contadorVisitadas = 0;
+function deuRuim(no,dimensao,arcoDefeituoso,a){
+	let contadorVisitadas = 1;
 	let visitadas = [];
-	let k = 1;
-	
-	do{
-	Colocar()
-	vericar()
-	}while()
-
-
-
+	visitadas[1] = no.caminho[1][a];
+	let i,k = no.caminho[1][1];
+		for(i=1;i<=dimensao;i++){
+			if(no.caminho[1][i] == k){
+				k = no.caminho[2][i];
+				if(!jaVisitadas(k,visitadas,contadorVisitadas) || k==no.caminho[1][1]){
+					visitadas[++contadorVisitadas] = k;
+					i=0;
+				}
+				else{
+					arcoDefeituoso.i = no.caminho[1][i];
+					arcoDefeituoso.j = no.caminho[2][i];
+					return true;
+				}
+			}
+		}
+	return false;
 }
 
-function penaliza(dimensao,matriz,I,J,n){
+function jaVisitadas(k,visitadas,contadorVisitadas){
+	let i;
+	for(i=1;i<=contadorVisitadas;i++){
+		if(k==visitadas[i])
+			return true;
+	}
+	return false;
+}
+
+function penaliza(dimensao,matriz,matrizOriginal,I,J,n){
 	var mat = [];
 	let i,j;
 
-	for(i=1;i<=dimensao;i++)	mat[i] = [];
-	mat = matriz;
+	for(i=1;i<=dimensao;i++){
+		mat[i] = [];
+		for(j=1;j<=dimensao;j++)
+			mat[i][j] = matrizOriginal[i][j];
+	}
 
 	if(n){
-		for(i=1;i<I;i++)	mat[i][J] = m;
-		for(i=I+1;i<=dimensao;i++)	mat[i][J] = m;
-		for(j=1;j<J;j++)	mat[I][j] = m;
-		for(j=J+1;j<=dimensao;j++)	mat[i][J] = m;
+		for(i=1;i<I;i++)	mat[i][J] = M;
+		for(i=I+1;i<=dimensao;i++)	mat[i][J] = M;
+			
+		for(j=1;j<J;j++)	mat[I][j] = M;
+		for(j=J+1;j<=dimensao;j++)	mat[I][j] = M;
 		return mat;
 	}
 
-	mat[I][J] = m;
+	mat[I][J] = M;
 	return mat;
 }
 
-function restoDoHungaro(no,dimensao){
+function restoDoHungaro(no,dimensao,matriz){
 	var zeros = [];	 	//salva quantos zeros existem em cada linha por indice(primeira posiçao do vetor salva quantos zeros existem na linha 1)
 	var marcados = [];	//coordenada dos valores marcados a serem possivelmente alocados
 	var riscados = [];	//coodenada de zeros que nao podem ser alocados
@@ -200,6 +283,7 @@ function restoDoHungaro(no,dimensao){
 		while(temZeros(zeros,dimensao))marcaERisca(no.matriz,zeros,riscados,marcados,dimensao,contador); //tenta fazer uma alocação	
 	}
 	no.caminho=marcados;
+	no.z = calculaZ(no,matriz,dimensao);
 }
 
 function subSomaMenor(marcadas,no,dimensao){
@@ -392,5 +476,17 @@ function main(){
 	r.p1 = null;
 	r.p2 = null;
 	
-	passeia(dimensao,tabela,no,r);
+	loop = {};
+	loop.contadorDeCaminhos = 0;
+	loop.caminhosPercorridos = [];
+	loop.vezes = [];
+	for(i=1;i<=100;i++){
+		loop.vezes[i] = 0;
+		loop.caminhosPercorridos[i] = [];
+		loop.caminhosPercorridos[i][1] = [];
+		loop.caminhosPercorridos[i][2] = [];
+	}
+
+	passeia(dimensao,tabela,tabela,no,r,loop);
+
 }
